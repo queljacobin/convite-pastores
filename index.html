@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Um convite especial</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* =========================
+       CONFIGURAÇÕES GERAIS
+    ========================== */
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --preto: #0b0b0b;
+      --preto-2: #121212;
+      --branco: #f8f5ef;
+      --dourado: #c9a96e;
+      --dourado-claro: #e2c98f;
+      --cinza: #aaa39a;
+    }
+
+    body {
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 50% 20%, #29251d 0%, transparent 35%),
+        radial-gradient(circle at 80% 80%, #1d1913 0%, transparent 30%),
+        var(--preto);
+
+      color: var(--branco);
+      font-family: 'Montserrat', sans-serif;
+      overflow-x: hidden;
+    }
+
+    button {
+      font-family: inherit;
+    }
+
+    .page {
+      min-height: 100vh;
+      width: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* =========================
+       EFEITO DE LUZ
+    ========================== */
+
+    .glow {
+      position: fixed;
+      width: 350px;
+      height: 350px;
+      border-radius: 50%;
+      background: rgba(201, 169, 110, 0.08);
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .glow.one {
+      top: -120px;
+      left: -120px;
+    }
+
+    .glow.two {
+      bottom: -150px;
+      right: -100px;
+    }
+
+    /* =========================
+       TELAS
+    ========================== */
+
+    .screen {
+      min-height: 100vh;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 30px 20px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .fade-in {
+      animation: fadeIn 1s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(15px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* =========================
+       ABERTURA
+    ========================== */
+
+    .opening {
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .small-label {
+      color: var(--dourado);
+      font-size: 10px;
+      letter-spacing: 4px;
+      font-weight: 600;
+      margin-bottom: 22px;
+      text-transform: uppercase;
+    }
+
+    .opening-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(42px, 12vw, 72px);
+      font-weight: 500;
+      line-height: 0.9;
+      margin-bottom: 12px;
+    }
+
+    .opening-subtitle {
+      color: var(--cinza);
+      font-size: 12px;
+      letter-spacing: 1.5px;
+      margin-bottom: 45px;
+    }
+
+    /* =========================
+       ENVELOPE
+    ========================== */
+
+    .envelope-wrapper {
+      width: 280px;
+      height: 190px;
+      position: relative;
+      margin-bottom: 45px;
+      perspective: 1000px;
+    }
+
+    .envelope {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .envelope-body {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: #171512;
+      border: 1px solid rgba(201, 169, 110, 0.5);
+      box-shadow:
+        0 20px 50px rgba(0, 0, 0, 0.5),
+        inset 0 0 40px rgba(201, 169, 110, 0.03);
+      overflow: hidden;
+    }
+
+    .envelope-body::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(145deg, transparent 49%, rgba(201, 169, 110, 0.25) 50%, transparent 51%),
+        linear-gradient(215deg, transparent 49%, rgba(201, 169, 110, 0.25) 50%, transparent 51%);
+    }
+
+    .envelope-flap {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      z-index: 3;
+      transform-origin: top center;
+      transition: transform 1s cubic-bezier(.65,0,.35,1);
+      transform-style: preserve-3d;
+    }
+
+    .envelope-flap::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: #201d18;
+      clip-path: polygon(0 0, 100% 0, 50% 58%);
+      border-top: 1px solid rgba(201, 169, 110, 0.55);
+    }
+
+    .envelope-seal {
+      position: absolute;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--dourado);
+      color: #171512;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 21px;
+      font-weight: 700;
+      left: 50%;
+      top: 51%;
+      transform: translate(-50%, -50%);
+      z-index: 5;
+      box-shadow: 0 5px 20px rgba(201, 169, 110, 0.25);
+    }
+
+    .envelope-letter {
+      position: absolute;
+      background: var(--branco);
+      color: var(--preto);
+      width: 78%;
+      height: 90%;
+      left: 11%;
+      bottom: 0;
+      z-index: 2;
+      transition: transform 1s cubic-bezier(.65,0,.35,1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .envelope-letter span {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 27px;
+    }
+
+    .envelope.open .envelope-flap {
+      transform: rotateX(180deg);
+      z-index: 1;
+    }
+
+    .envelope.open .envelope-letter {
+      transform: translateY(-65px);
+    }
+
+    /* =========================
+       BOTÕES
+    ========================== */
+
+    .main-button {
+      border: 1px solid var(--dourado);
+      background: transparent;
+      color: var(--branco);
+      padding: 15px 28px;
+      min-width: 210px;
+      font-size: 10px;
+      letter-spacing: 2.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .main-button::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 0;
+      height: 100%;
+      background: var(--dourado);
+      transition: width 0.35s ease;
+      z-index: -1;
+    }
+
+    .main-button:hover {
+      color: var(--preto);
+    }
+
+    .main-button:hover::before {
+      width: 100%;
+    }
+
+    .main-button:active {
+      transform: scale(0.97);
+    }
+
+    /* =========================
+       CONVITE
+    ========================== */
+
+    .invite-screen {
+      padding-top: 55px;
+      padding-bottom: 55px;
+    }
+
+    .invite-card {
+      width: min(100%, 540px);
+      border: 1px solid rgba(201, 169, 110, 0.35);
+      background: rgba(15, 15, 15, 0.75);
+      backdrop-filter: blur(10px);
+      padding: 42px 28px;
+      text-align: center;
+      position: relative;
+      box-shadow: 0 30px 80px rgba(0,0,0,.4);
+    }
+
+    .invite-card::before,
+    .invite-card::after {
+      content: "";
+      position: absolute;
+      width: 45px;
+      height: 45px;
+      border-color: var(--dourado);
+      opacity: .7;
+    }
+
+    .invite-card::before {
+      top: 12px;
+      left: 12px;
+      border-top: 1px solid;
+      border-left: 1px solid;
+    }
+
+    .invite-card::after {
+      bottom: 12px;
+      right: 12px;
+      border-bottom: 1px solid;
+      border-right: 1px solid;
+    }
+
+    .ornament {
+      color: var(--dourado);
+      font-size: 22px;
+      margin-bottom: 18px;
+    }
+
+    .invite-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(43px, 12vw, 64px);
+      line-height: .9;
+      font-weight: 600;
+      margin-bottom: 28px;
+    }
+
+    .invite-title span {
+      color: var(--dourado);
+      display: block;
+    }
+
+    .for-text {
+      color: var(--cinza);
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      font-size: 9px;
+      margin-bottom: 12px;
+    }
+
+    .pastors {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 28px;
+      line-height: 1.15;
+      margin-bottom: 32px;
+    }
+
+    .divider {
+      width: 50px;
+      height: 1px;
+      background: var(--dourado);
+      margin: 0 auto 30px;
+    }
+
+    .message {
+      font-size: 13px;
+      line-height: 1.9;
+      color: #ddd8cf;
+      font-weight: 300;
+      margin-bottom: 28px;
+    }
+
+    .message strong {
+      color: var(--branco);
+      font-weight: 500;
+    }
+
+    .location {
+      margin: 28px 0;
+      padding: 18px 10px;
+      border-top: 1px solid rgba(201, 169, 110, .18);
+      border-bottom: 1px solid rgba(201, 169, 110, .18);
+    }
+
+    .location-label {
+      color: var(--dourado);
+      font-size: 9px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .location-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 24px;
+    }
+
+    .mystery {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 21px;
+      line-height: 1.35;
+      margin: 28px 0;
+      color: var(--branco);
+    }
+
+    .mystery span {
+      color: var(--dourado);
+    }
+
+    .expectation {
+      font-size: 11px;
+      color: var(--cinza);
+      line-height: 1.7;
+      margin-bottom: 30px;
+    }
+
+    .signature {
+      margin-top: 32px;
+      color: var(--cinza);
+      font-size: 11px;
+      line-height: 1.8;
+    }
+
+    .signature strong {
+      color: var(--branco);
+      font-weight: 500;
+    }
+
+    /* =========================
+       TELA DE CONFIRMAÇÃO
+    ========================== */
+
+    .confirmation {
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .check-circle {
+      width: 90px;
+      height: 90px;
+      border: 1px solid var(--dourado);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 35px;
+      animation: pulse 2s infinite;
+    }
+
+    .check {
+      font-family: 'Cormorant Garamond', serif;
+      color: var(--dourado);
+      font-size: 48px;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        box-shadow: 0 0 0 rgba(201,169,110,0);
+      }
+
+      50% {
+        box-shadow: 0 0 35px rgba(201,169,110,.15);
+      }
+    }
+
+    .confirmation h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(44px, 12vw, 64px);
+      font-weight: 500;
+      line-height: .9;
+      margin-bottom: 22px;
+    }
+
+    .confirmation h2 span {
+      color: var(--dourado);
+    }
+
+    .confirmation p {
+      max-width: 330px;
+      color: var(--cinza);
+      font-size: 12px;
+      line-height: 1.8;
+      margin-bottom: 35px;
+    }
+
+    /* =========================
+       PARTÍCULAS
+    ========================== */
+
+    .particle {
+      position: fixed;
+      width: 2px;
+      height: 2px;
+      background: var(--dourado);
+      border-radius: 50%;
+      opacity: .4;
+      animation: float linear infinite;
+      pointer-events: none;
+    }
+
+    @keyframes float {
+      from {
+        transform: translateY(100vh);
+        opacity: 0;
+      }
+
+      20% {
+        opacity: .5;
+      }
+
+      80% {
+        opacity: .4;
+      }
+
+      to {
+        transform: translateY(-10vh);
+        opacity: 0;
+      }
+    }
+
+    /* =========================
+       DESKTOP
+    ========================== */
+
+    @media (min-width: 700px) {
+
+      .invite-card {
+        padding: 60px 70px;
+      }
+
+      .message {
+        font-size: 14px;
+      }
+
+      .envelope-wrapper {
+        width: 320px;
+        height: 215px;
+      }
+    }
+
+    /* =========================
+       REDUÇÃO DE MOVIMENTO
+    ========================== */
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="page">
+
+    <div class="glow one"></div>
+    <div class="glow two"></div>
+
+    <!-- =========================
+         TELA 1 - ABERTURA
+    ========================== -->
+
+    <section id="openingScreen" class="screen opening">
+
+      <div class="small-label">
+        Um convite especial
+      </div>
+
+      <h1 class="opening-title">
+        Para vocês
+      </h1>
+
+      <p class="opening-subtitle">
+        Preparamos algo com muito carinho.
+      </p>
+
+      <div class="envelope-wrapper">
+
+        <div id="envelope" class="envelope">
+
+          <div class="envelope-body"></div>
+
+          <div class="envelope-letter">
+            <span>🤍</span>
+          </div>
+
+          <div class="envelope-flap"></div>
+
+          <div class="envelope-seal">
+            L
+          </div>
+
+        </div>
+
+      </div>
+
+      <button id="openButton" class="main-button">
+        ABRIR CONVITE
+      </button>
+
+    </section>
+
+
+    <!-- =========================
+         TELA 2 - CONVITE
+    ========================== -->
+
+    <section id="inviteScreen" class="screen invite-screen hidden">
+
+      <div class="invite-card">
+
+        <div class="ornament">
+          ✦
+        </div>
+
+        <div class="for-text">
+          Para nossos pastores
+        </div>
+
+        <h2 class="invite-title">
+          Uma noite
+          <span>especial</span>
+        </h2>
+
+        <div class="pastors">
+          Lucas, Larissa<br>
+          e Lobinho(a)
+        </div>
+
+        <div class="divider"></div>
+
+        <p class="message">
+          Queremos convidá-los para uma noite muito especial,
+          preparada com muito carinho por seus discípulos,
+          como forma de agradecer por <strong>tudo que vocês fizeram
+          e continuam fazendo em nossas vidas.</strong>
+        </p>
+
+        <p class="message">
+          Vocês são únicos e, por isso, merecem algo único.
+        </p>
+
+        <div class="location">
+
+          <div class="location-label">
+            Quando e onde
+          </div>
+
+          <div class="location-text">
+            Após a Arena
+            <br>
+            Sala 05
+          </div>
+
+        </div>
+
+        <div class="mystery">
+ 	 Não vamos contar o que preparamos...
+ 	 <br>
+  	<span>Mas venham de estômago vazio.</span>
+	</div>
+
+        <p class="expectation">
+          Só queremos que venham com expectativa.
+          <br>
+          O resto vocês descobrem lá.
+        </p>
+
+        <button id="confirmButton" class="main-button">
+          CONFIRMAR PRESENÇA
+        </button>
+
+        <div class="signature">
+          Com muito carinho,<br>
+          <strong>seus discípulos </strong>
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =========================
+         TELA 3 - CONFIRMAÇÃO
+    ========================== -->
+
+    <section id="confirmationScreen" class="screen confirmation hidden">
+
+      <div class="check-circle">
+        <div class="check">
+          ✓
+        </div>
+      </div>
+
+      <div class="small-label">
+        Presença confirmada
+      </div>
+
+      <h2>
+        Missão<br>
+        <span>aceita.</span>
+      </h2>
+
+      <p>
+        Agora só falta uma coisa:
+        guardar a expectativa até depois da Arena.
+        <br><br>
+        Nos vemos na Sala 05.
+      </p>
+
+      <button id="backButton" class="main-button">
+        VOLTAR AO CONVITE
+      </button>
+
+    </section>
+
+  </div>
+
+
+  <script>
+
+    /* =========================
+       ELEMENTOS
+    ========================== */
+
+    const envelope = document.getElementById("envelope");
+    const openButton = document.getElementById("openButton");
+
+    const openingScreen = document.getElementById("openingScreen");
+    const inviteScreen = document.getElementById("inviteScreen");
+    const confirmationScreen = document.getElementById("confirmationScreen");
+
+    const confirmButton = document.getElementById("confirmButton");
+    const backButton = document.getElementById("backButton");
+
+
+    /* =========================
+       ABRIR ENVELOPE
+    ========================== */
+
+    openButton.addEventListener("click", function() {
+
+      envelope.classList.add("open");
+
+      openButton.disabled = true;
+      openButton.style.opacity = "0";
+
+      setTimeout(function() {
+
+        openingScreen.classList.add("hidden");
+
+        inviteScreen.classList.remove("hidden");
+        inviteScreen.classList.add("fade-in");
+
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth"
+        });
+
+      }, 1200);
+
+    });
+
+
+    /* =========================
+       CONFIRMAR PRESENÇA
+    ========================== */
+
+    confirmButton.addEventListener("click", function() {
+
+      inviteScreen.classList.add("hidden");
+
+      confirmationScreen.classList.remove("hidden");
+      confirmationScreen.classList.add("fade-in");
+
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+      });
+
+      createCelebration();
+
+    });
+
+
+    /* =========================
+       VOLTAR
+    ========================== */
+
+    backButton.addEventListener("click", function() {
+
+      confirmationScreen.classList.add("hidden");
+
+      inviteScreen.classList.remove("hidden");
+
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+      });
+
+    });
+
+
+    /* =========================
+       PARTÍCULAS
+    ========================== */
+
+    function createParticles() {
+
+      for (let i = 0; i < 25; i++) {
+
+        const particle = document.createElement("div");
+
+        particle.classList.add("particle");
+
+        particle.style.left = Math.random() * 100 + "vw";
+
+        particle.style.animationDuration =
+          (5 + Math.random() * 8) + "s";
+
+        particle.style.animationDelay =
+          Math.random() * 8 + "s";
+
+        particle.style.opacity =
+          Math.random() * 0.5;
+
+        document.body.appendChild(particle);
+
+      }
+
+    }
+
+    createParticles();
+
+
+    /* =========================
+       PEQUENA CELEBRAÇÃO
+    ========================== */
+
+    function createCelebration() {
+
+      for (let i = 0; i < 15; i++) {
+
+        const particle = document.createElement("div");
+
+        particle.classList.add("particle");
+
+        particle.style.position = "fixed";
+        particle.style.left = "50%";
+        particle.style.top = "50%";
+
+        particle.style.width = "4px";
+        particle.style.height = "4px";
+
+        particle.style.transform =
+          `translate(${(Math.random() - 0.5) * 250}px,
+                     ${(Math.random() - 0.5) * 250}px)`;
+
+        particle.style.transition =
+          "all 1s ease";
+
+        particle.style.opacity = "0.8";
+
+        document.body.appendChild(particle);
+
+        setTimeout(() => {
+          particle.style.opacity = "0";
+        }, 50);
+
+        setTimeout(() => {
+          particle.remove();
+        }, 1200);
+
+      }
+
+    }
+
+  </script>
+
+</body>
+</html>

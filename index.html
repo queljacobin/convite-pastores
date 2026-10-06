@@ -217,7 +217,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-family: 'Cormorant Garamond', serif;
+      font-family: 'Montserrat', sans-serif;
       font-size: 21px;
       font-weight: 700;
       left: 50%;
@@ -795,21 +795,50 @@
        CONFIRMAR PRESENÇA
     ========================== */
 
-    confirmButton.addEventListener("click", function() {
+confirmButton.addEventListener("click", async function() {
 
-      inviteScreen.classList.add("hidden");
+  confirmButton.disabled = true;
+  confirmButton.textContent = "CONFIRMANDO...";
 
-      confirmationScreen.classList.remove("hidden");
-      confirmationScreen.classList.add("fade-in");
+  try {
 
-      window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-      });
-
-      createCelebration();
-
+    const response = await fetch("https://formspree.io/f/xeaeegnq", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      body: JSON.stringify({
+        mensagem: "Uma pessoa confirmou presença pelo convite dos pastores."
+      })
     });
+
+    if (!response.ok) {
+      throw new Error("Erro ao enviar confirmação");
+    }
+
+    inviteScreen.classList.add("hidden");
+
+    confirmationScreen.classList.remove("hidden");
+    confirmationScreen.classList.add("fade-in");
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+
+    createCelebration();
+
+  } catch (error) {
+
+    confirmButton.disabled = false;
+    confirmButton.textContent = "CONFIRMAR PRESENÇA";
+
+    alert("Não foi possível confirmar agora. Tente novamente.");
+
+  }
+
+});
 
 
     /* =========================
